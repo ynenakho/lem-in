@@ -6,17 +6,17 @@
 #    By: ynenakho <ynenakho@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/19 18:23:28 by ynenakho          #+#    #+#              #
-#    Updated: 2019/02/21 22:31:46 by ynenakho         ###   ########.fr        #
+#    Updated: 2019/02/22 16:17:20 by ynenakho         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = lem-in
 CC = gcc
-FLAGS = -Wall -Wextra -Werror -O3 -g
-SRC = main.c error.c
+FLAGS = -Wall -Wextra -Werror -g
+SRC = main.c error.c bfs_algo.c
 OBJ = $(SRC:.c=.o)
 
-DEPS = ft_ls.h
+DEPS = lemin.h
 LIBS = ./libft/libft.a
 
 
