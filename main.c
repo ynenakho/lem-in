@@ -6,7 +6,7 @@
 /*   By: ynenakho <ynenakho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 19:55:03 by ynenakho          #+#    #+#             */
-/*   Updated: 2019/02/22 22:07:31 by ynenakho         ###   ########.fr       */
+/*   Updated: 2019/02/26 23:51:37 by ynenakho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,30 +14,23 @@
 
 int main()
 {
-    t_lemin lemin;
+    // t_lemin lemin;
 
-    ft_bzero(&lemin, sizeof(t_lemin));
-    read_stdin(&lemin);
+    // ft_bzero(&lemin, sizeof(t_lemin));
+    // read_stdin(&lemin);
     
-    ft_putstr(lemin.input);
-
-
 
     // TEST GRAPH!!!!
-    // struct Graph* graph = createGraph(6);
-    // addEdge(graph, 0, 1);
-    // addEdge(graph, 0, 2);
-    // addEdge(graph, 1, 2);
-    // addEdge(graph, 1, 4);
-    // addEdge(graph, 1, 3);
-    // addEdge(graph, 2, 4);
-    // addEdge(graph, 3, 4);
+    t_graph *graph = createGraph(6);
+    addEdge(graph, 0, 1);
+    addEdge(graph, 0, 2);
+    addEdge(graph, 1, 2);
+    addEdge(graph, 1, 4);
+    addEdge(graph, 1, 3);
+    addEdge(graph, 2, 4);
+    addEdge(graph, 3, 4);
  
-    // bfs(graph, 0);
-
-
-
-
+    bfs(graph, 0, 4, 4);
 
     return (0);
 }
@@ -52,16 +45,6 @@ int	go_gnl(int i, char **line)
 	return (get_next_line(i, line));
 }
 
-// int check_number(char *str_to_check)
-// {
-//     int int_to_check;
-//     int_to_check = ft_atoi(str_to_check);
-//     if(!ft_strcmp(str_to_check, ft_itoa(int_to_check)))
-//         return (1);
-//     return (0);
-// }
-
-
 void check_num_of_ants(char *line, t_lemin *lemin)
 {
     int int_to_check;
@@ -73,6 +56,26 @@ void check_num_of_ants(char *line, t_lemin *lemin)
         exit_error("Number of ants is in a wrong format: ", line);
 }
 
+t_room *create_room(char *room_name, int x, int y, bool start, bool end)
+{
+    t_room *new_room;
+    new_room = malloc(sizeof(t_room));
+    new_room->room_name = room_name;
+    new_room->x = x;
+    new_room->y = y;
+    new_room->start = start;
+    new_room->end = end;
+    new_room->next = NULL;
+    return new_room;
+}
+
+t_room *add_to_rooms(t_room *head, t_room *room_to_add)
+{
+    room_to_add->next = head;
+    head = room_to_add;
+    return head;
+}
+
 void check_room_coords(char *line, t_lemin *lemin, int *start_flag, int *end_flag, int *run_count)
 {
     int sosi;
@@ -81,7 +84,7 @@ void check_room_coords(char *line, t_lemin *lemin, int *start_flag, int *end_fla
 
     char **result;
 
-    char *point_name;
+    char *room_name;
     result = ft_strsplit(line, ' ');
     if (result[0] && !result[1])
     {
@@ -91,10 +94,15 @@ void check_room_coords(char *line, t_lemin *lemin, int *start_flag, int *end_fla
 
     if (!result[0] || !result[1] || !result[2])
         exit_error("Error with coordinates format: ", line);
-    point_name = result[0];
-    int first_coord = atoi(result[1]);
-    int second_coord = atoi(result[2]);
-    printf("coord = %s %d %d start = %d end = %d\n", point_name, first_coord, second_coord, *start_flag, *end_flag);
+    room_name = result[0];
+    int x = atoi(result[1]);
+    int y = atoi(result[2]);
+    printf("coord = %s %d %d start = %d end = %d\n", room_name, x, y, *start_flag, *end_flag);
+    if (!lemin->linked_rooms)
+        lemin->linked_rooms = create_room(room_name, x, y, *start_flag, *end_flag);
+    else
+        lemin->linked_rooms = add_to_rooms(lemin->linked_rooms, create_room(room_name, x, y, *start_flag, *end_flag));
+    lemin->num_rooms++;
     *start_flag = (*start_flag == 1 || *start_flag == -1) ? -1: 0;
     *end_flag = (*end_flag == 1 || *end_flag == -1) ? -1: 0;
 }
@@ -120,7 +128,10 @@ int check_for_errors(char *line, int *start_flag, int *end_flag)
         return (1);
     }
     if (line[0] == '#')
+    {
+        ft_putendl(line);
         return (1);
+    }
     return (0);
 }
 
@@ -135,7 +146,16 @@ void check_links(t_lemin *lemin, char *line)
     rooms = ft_strsplit(ft_strtrim(line), '-');
     if (!rooms[0] || !rooms[1])
         exit_error("Error with link format: ", line);
-    printf("link = %s - %s\n", rooms[0], rooms[1]);
+    printf("link = %s - %s\n", ft_strtrim(rooms[0]), ft_strtrim(rooms[1]));
+}
+
+void print_rooms(t_room *rooms)
+{
+    while (rooms)
+    {
+        printf("Name = %s x = %d y = %d\n", rooms->room_name, rooms->x, rooms->y);
+        rooms = rooms->next;
+    }
 }
 
 void read_stdin(t_lemin *lemin) {
@@ -152,7 +172,6 @@ void read_stdin(t_lemin *lemin) {
             run_count = 2;
             continue ;
         }
-        // printf("HERE!!!!");
         if (run_count == 2)
             check_room_coords(line, lemin, &start_flag, &end_flag, &run_count);
         if (run_count == 3)
@@ -162,5 +181,8 @@ void read_stdin(t_lemin *lemin) {
             check_links(lemin, line);
         }
     }
+    printf("INPUT FINISHED\n");
+    print_rooms(lemin->linked_rooms);
+    printf("Number of rooms = %d\n", lemin->num_rooms);
 }
             
