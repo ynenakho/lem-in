@@ -6,7 +6,7 @@
 /*   By: ynenakho <ynenakho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 19:55:03 by ynenakho          #+#    #+#             */
-/*   Updated: 2019/02/26 23:51:37 by ynenakho         ###   ########.fr       */
+/*   Updated: 2019/02/27 13:06:57 by ynenakho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,23 +14,23 @@
 
 int main()
 {
-    // t_lemin lemin;
+    t_lemin lemin;
 
-    // ft_bzero(&lemin, sizeof(t_lemin));
-    // read_stdin(&lemin);
+    ft_bzero(&lemin, sizeof(t_lemin));
+    read_stdin(&lemin);
     
 
     // TEST GRAPH!!!!
-    t_graph *graph = createGraph(6);
-    addEdge(graph, 0, 1);
-    addEdge(graph, 0, 2);
-    addEdge(graph, 1, 2);
-    addEdge(graph, 1, 4);
-    addEdge(graph, 1, 3);
-    addEdge(graph, 2, 4);
-    addEdge(graph, 3, 4);
+    // t_graph *graph = createGraph(6);
+    // addEdge(graph, 0, 1);
+    // addEdge(graph, 0, 2);
+    // addEdge(graph, 1, 2);
+    // addEdge(graph, 1, 4);
+    // addEdge(graph, 1, 3);
+    // addEdge(graph, 2, 4);
+    // addEdge(graph, 3, 4);
  
-    bfs(graph, 0, 4, 4);
+    // bfs(graph, 0, 4, 4);
 
     return (0);
 }
@@ -151,6 +151,7 @@ void check_links(t_lemin *lemin, char *line)
 
 void print_rooms(t_room *rooms)
 {
+
     while (rooms)
     {
         printf("Name = %s x = %d y = %d\n", rooms->room_name, rooms->x, rooms->y);
