@@ -6,7 +6,7 @@
 /*   By: ynenakho <ynenakho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 19:55:03 by ynenakho          #+#    #+#             */
-/*   Updated: 2019/02/27 13:06:57 by ynenakho         ###   ########.fr       */
+/*   Updated: 2019/02/27 15:31:59 by ynenakho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,18 @@
 int main()
 {
     t_lemin lemin;
-
+    
     ft_bzero(&lemin, sizeof(t_lemin));
     read_stdin(&lemin);
+    rooms_to_dict(&lemin);
     
+
+    find(lemin.dict, "room2");
+    find(lemin.dict, "room4");
+    find(lemin.dict, "room1");
+    find(lemin.dict, "room3");
+
+    printf("End = %s Start = %s\n", lemin.end->room_name, lemin.start->room_name);
 
     // TEST GRAPH!!!!
     // t_graph *graph = createGraph(6);
@@ -33,6 +41,22 @@ int main()
     // bfs(graph, 0, 4, 4);
 
     return (0);
+}
+
+void rooms_to_dict(t_lemin *lemin)
+{
+    int i = 0;
+    t_room *tmp;
+
+    lemin->dict = dictInit(lemin->num_rooms);
+    tmp = lemin->linked_rooms;
+    while (i < lemin->num_rooms) 
+    {
+        dictInsert(lemin->dict, tmp->room_name, tmp);
+        tmp->index = i;
+        tmp = tmp->next;
+        i++;
+    }
 }
 
 int	go_gnl(int i, char **line)
@@ -56,15 +80,15 @@ void check_num_of_ants(char *line, t_lemin *lemin)
         exit_error("Number of ants is in a wrong format: ", line);
 }
 
-t_room *create_room(char *room_name, int x, int y, bool start, bool end)
+t_room *create_room(char *room_name, int x, int y, int start, int end)
 {
     t_room *new_room;
     new_room = malloc(sizeof(t_room));
     new_room->room_name = room_name;
     new_room->x = x;
     new_room->y = y;
-    new_room->start = start;
-    new_room->end = end;
+    new_room->start = (start > 0) ? 1: 0;
+    new_room->end = (end > 0) ? 1: 0;
     new_room->next = NULL;
     return new_room;
 }
@@ -98,6 +122,10 @@ void check_room_coords(char *line, t_lemin *lemin, int *start_flag, int *end_fla
     int x = atoi(result[1]);
     int y = atoi(result[2]);
     printf("coord = %s %d %d start = %d end = %d\n", room_name, x, y, *start_flag, *end_flag);
+    if (*start_flag == 1)
+        lemin->start = create_room(room_name, x, y, *start_flag, *end_flag);
+    if (*end_flag == 1)
+        lemin->end = create_room(room_name, x, y, *start_flag, *end_flag);
     if (!lemin->linked_rooms)
         lemin->linked_rooms = create_room(room_name, x, y, *start_flag, *end_flag);
     else
@@ -185,5 +213,7 @@ void read_stdin(t_lemin *lemin) {
     printf("INPUT FINISHED\n");
     print_rooms(lemin->linked_rooms);
     printf("Number of rooms = %d\n", lemin->num_rooms);
+
+
 }
             
