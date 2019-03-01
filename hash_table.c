@@ -6,52 +6,41 @@
 /*   By: ynenakho <ynenakho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/27 14:13:18 by ynenakho          #+#    #+#             */
-/*   Updated: 2019/02/27 15:33:00 by ynenakho         ###   ########.fr       */
+/*   Updated: 2019/02/28 17:55:05 by ynenakho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lemin.h"
 
-// typedef struct  s_art {
-// 	char *name;
-// 	int  price;
-// }               t_art;
-
-
-
-
-
-/*
-** Utils
-*/
-
-// int		arts_len(t_art **arts)
-// {
-// 	int		len;
-
-// 	len = 0;
-// 	while (arts[len])
-// 		len++;
-// 	return (len);
-// }
-
 /*
 **	List functions
 */
 
-t_item			*ft_lstlast(t_item *list)
-{
-	while (list && list->next)
-		list = list->next;
-	return (list);
-}
+// t_item			*ft_lstlast(t_item *list)
+// {
+// 	while (list && list->next)
+// 		list = list->next;
+// 	return (list);
+// }
+
+// void			ft_lstaddback(t_item **alst, t_item *new)
+// {
+// 	if (*alst == NULL)
+// 		*alst = new;
+// 	else
+// 		ft_lstlast(*alst)->next = new;
+// }
 
 void			ft_lstaddback(t_item **alst, t_item *new)
 {
 	if (*alst == NULL)
 		*alst = new;
 	else
-		ft_lstlast(*alst)->next = new;
+	{
+		while (*alst && (*alst)->next)
+			*alst = (*alst)->next;
+		(*alst)->next = new;
+	}
 }
 
 /*
@@ -114,7 +103,7 @@ t_room *dictSearch(struct s_dict *dict, char *key)
 	return (NULL);
 }
 
-void		find(t_dict *d, char *key) {
+void		find(t_dict *d, char *key) { //just for tests
 	t_room	*room;
 
 	room = dictSearch(d, key);
