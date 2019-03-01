@@ -6,14 +6,17 @@
 /*   By: ynenakho <ynenakho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/22 13:08:06 by ynenakho          #+#    #+#             */
-/*   Updated: 2019/02/27 15:22:03 by ynenakho         ###   ########.fr       */
+/*   Updated: 2019/02/28 17:55:00 by ynenakho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lemin.h"
 
-void bfs(t_graph *graph, int startVertex, int endVertex, int size)
+void bfs(t_graph *graph, int startVertex, int endVertex, int size, t_lemin *lemin)
 {
+    t_room *tmp; // just for test
+    
+
     int currentVertex;
     int adjVertex;
     t_node *temp;
@@ -25,9 +28,17 @@ void bfs(t_graph *graph, int startVertex, int endVertex, int size)
     enqueue(q, startVertex, size);
     while(!isEmpty(q))
     {
-        count = 0;
+        tmp = lemin->linked_rooms; // just for test
+        // count = 0;
         printQueue(q);
         currentVertex = dequeue(q);
+        while (tmp) { // just for test delete afterwards
+            if (tmp->index == currentVertex) {
+                printf("\nVISITED %s\n", tmp->room_name);
+                break;
+            }
+            tmp = tmp->next;
+        }
         printf("Visited %d\n", currentVertex);
         
         temp = graph->adjLists[currentVertex];
@@ -36,18 +47,14 @@ void bfs(t_graph *graph, int startVertex, int endVertex, int size)
             adjVertex = temp->vertex;
             if(graph->visited[adjVertex] == 0)
             {
-                count++;
                 graph->visited[adjVertex] = 1;
                 enqueue(q, adjVertex, size);
-                
             }
-            
-            
             temp = temp->next;
-            
-       }
-       if (currentVertex == endVertex) 
-                    printf("Count = %d\n", count);
+        }
+        count++;
+        if (currentVertex == endVertex) 
+            printf("Count = %d\n", count);
     }
 }
 
@@ -80,19 +87,42 @@ t_graph *createGraph(int rooms)
     return graph;
 }
  
-void addEdge(t_graph *graph, int ind_from, int ind_to)
+// void addEdge(t_lemin *lemin, char *room_from, char *room_to)
+// {
+//     // Add edge from src to dest
+//     t_room *new_room_to;
+//     t_room *new_room_from;
+
+//     new_room_to = dictSearch(lemin->dict, room_to);
+//     new_room_from = dictSearch(lemin->dict, room_from);
+
+//     new_room_to->next = lemin->graph->adjLists[new_room_from->index];
+//     lemin->graph->adjLists[new_room_from->index] = new_room_to;
+ 
+//     // Add edge ind_from ind_to ind_to ind_from
+//     new_room_from->next = lemin->graph->adjLists[new_room_to->index];
+//     lemin->graph->adjLists[new_room_to->index] = new_room_from;
+// }
+
+void addEdge(t_lemin *lemin, char *room_from, char *room_to)
 {
+    t_room *new_room_to;
+    t_room *new_room_from;
+
+    new_room_to = dictSearch(lemin->dict, room_to);
+    new_room_from = dictSearch(lemin->dict, room_from);
+    
     // Add edge from src to dest
     t_node *newNode;
 
-    newNode = createNode(ind_to);
-    newNode->next = graph->adjLists[ind_from];
-    graph->adjLists[ind_from] = newNode;
+    newNode = createNode(new_room_to->index);
+    newNode->next = lemin->graph->adjLists[new_room_from->index];
+    lemin->graph->adjLists[new_room_from->index] = newNode;
  
     // Add edge ind_from ind_to ind_to ind_from
-    newNode = createNode(ind_from);
-    newNode->next = graph->adjLists[ind_to];
-    graph->adjLists[ind_to] = newNode;
+    newNode = createNode(new_room_from->index);
+    newNode->next = lemin->graph->adjLists[new_room_to->index];
+    lemin->graph->adjLists[new_room_to->index] = newNode;
 }
 
 t_queue* createQueue(int size) {

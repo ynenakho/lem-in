@@ -6,7 +6,7 @@
 /*   By: ynenakho <ynenakho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 19:55:03 by ynenakho          #+#    #+#             */
-/*   Updated: 2019/02/27 15:31:59 by ynenakho         ###   ########.fr       */
+/*   Updated: 2019/02/28 17:55:02 by ynenakho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,17 +18,22 @@ int main()
     
     ft_bzero(&lemin, sizeof(t_lemin));
     read_stdin(&lemin);
-    rooms_to_dict(&lemin);
+    
     
 
-    find(lemin.dict, "room2");
-    find(lemin.dict, "room4");
     find(lemin.dict, "room1");
+    find(lemin.dict, "room2");
     find(lemin.dict, "room3");
+    find(lemin.dict, "room4");
+    find(lemin.dict, "room5");
+    find(lemin.dict, "room6");
+    find(lemin.dict, "room7");
+    find(lemin.dict, "room8");
 
-    printf("End = %s Start = %s\n", lemin.end->room_name, lemin.start->room_name);
+    printf("End = %s ind = %d Start = %s ind = %d\n", lemin.end->room_name, lemin.end->index,lemin.start->room_name,lemin.start->index );
 
     // TEST GRAPH!!!!
+    printf("-------------------------");
     // t_graph *graph = createGraph(6);
     // addEdge(graph, 0, 1);
     // addEdge(graph, 0, 2);
@@ -38,7 +43,7 @@ int main()
     // addEdge(graph, 2, 4);
     // addEdge(graph, 3, 4);
  
-    // bfs(graph, 0, 4, 4);
+    bfs(lemin.graph, lemin.start->index, lemin.end->index, lemin.num_rooms, &lemin);
 
     return (0);
 }
@@ -53,7 +58,7 @@ void rooms_to_dict(t_lemin *lemin)
     while (i < lemin->num_rooms) 
     {
         dictInsert(lemin->dict, tmp->room_name, tmp);
-        tmp->index = i;
+        // tmp->index = i;
         tmp = tmp->next;
         i++;
     }
@@ -80,8 +85,12 @@ void check_num_of_ants(char *line, t_lemin *lemin)
         exit_error("Number of ants is in a wrong format: ", line);
 }
 
+// int g_ind = 0;
+
 t_room *create_room(char *room_name, int x, int y, int start, int end)
 {
+    static int ind = 0;
+    
     t_room *new_room;
     new_room = malloc(sizeof(t_room));
     new_room->room_name = room_name;
@@ -89,6 +98,7 @@ t_room *create_room(char *room_name, int x, int y, int start, int end)
     new_room->y = y;
     new_room->start = (start > 0) ? 1: 0;
     new_room->end = (end > 0) ? 1: 0;
+    new_room->index = ind++;
     new_room->next = NULL;
     return new_room;
 }
@@ -122,14 +132,16 @@ void check_room_coords(char *line, t_lemin *lemin, int *start_flag, int *end_fla
     int x = atoi(result[1]);
     int y = atoi(result[2]);
     printf("coord = %s %d %d start = %d end = %d\n", room_name, x, y, *start_flag, *end_flag);
-    if (*start_flag == 1)
-        lemin->start = create_room(room_name, x, y, *start_flag, *end_flag);
-    if (*end_flag == 1)
-        lemin->end = create_room(room_name, x, y, *start_flag, *end_flag);
+    
     if (!lemin->linked_rooms)
         lemin->linked_rooms = create_room(room_name, x, y, *start_flag, *end_flag);
     else
         lemin->linked_rooms = add_to_rooms(lemin->linked_rooms, create_room(room_name, x, y, *start_flag, *end_flag));
+    if (*start_flag == 1)
+        lemin->start = lemin->linked_rooms;
+    if (*end_flag == 1)
+        lemin->end = lemin->linked_rooms;
+    
     lemin->num_rooms++;
     *start_flag = (*start_flag == 1 || *start_flag == -1) ? -1: 0;
     *end_flag = (*end_flag == 1 || *end_flag == -1) ? -1: 0;
@@ -165,16 +177,15 @@ int check_for_errors(char *line, int *start_flag, int *end_flag)
 
 void check_links(t_lemin *lemin, char *line)
 {
-    int sosi;
-    if (lemin)
-        sosi = 0;
-
     char **rooms;
 
     rooms = ft_strsplit(ft_strtrim(line), '-');
     if (!rooms[0] || !rooms[1])
         exit_error("Error with link format: ", line);
     printf("link = %s - %s\n", ft_strtrim(rooms[0]), ft_strtrim(rooms[1]));
+    // printf("|%s| |%s|\n", rooms[0], ft_strtrim(rooms[0]));
+    addEdge(lemin, ft_strtrim(rooms[0]), ft_strtrim(rooms[1]));
+
 }
 
 void print_rooms(t_room *rooms)
@@ -205,6 +216,10 @@ void read_stdin(t_lemin *lemin) {
             check_room_coords(line, lemin, &start_flag, &end_flag, &run_count);
         if (run_count == 3)
         {
+            if (lemin->graph == NULL) {
+                rooms_to_dict(lemin);
+                lemin->graph = createGraph(lemin->num_rooms);
+            }
             if (end_flag != -1 || start_flag != -1)
                 exit_error("Start and End point should be defined", "");
             check_links(lemin, line);
