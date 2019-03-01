@@ -6,7 +6,7 @@
 /*   By: ynenakho <ynenakho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 19:58:16 by ynenakho          #+#    #+#             */
-/*   Updated: 2019/02/27 15:29:37 by ynenakho         ###   ########.fr       */
+/*   Updated: 2019/02/28 21:46:23 by ynenakho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,38 +14,6 @@
 # define LEMIN_H
 # include "libft/libft.h"
 # include <stdbool.h>
-
-typedef struct  s_room
-{
-    char *room_name;
-    int x;
-    int y;
-    int index;
-    int start;
-    int end;
-    struct s_room *next;
-}               t_room;
-
-typedef struct s_item {
-	char           *key; //here the key will be the name
-	t_room *room; // struct s_art   *value;
-	struct s_item  *next;
-}               t_item;
-
-typedef struct s_dict {
-	t_item      **items;
-	int           capacity; //the capacity of the array 'items'
-}               t_dict;
-
-typedef struct  s_lemin
-{
-    t_room  *start;
-    t_room  *end;
-    int     num_rooms;
-    int     num_of_ants;
-    t_room  *linked_rooms;
-    t_dict  *dict;
-}               t_lemin;
 
 /*
 ** BFS stucts
@@ -74,6 +42,46 @@ typedef struct s_graph
 }              t_graph;
 
 /*
+** main structures
+*/
+
+
+typedef struct  s_room
+{
+    char *room_name;
+    int x;
+    int y;
+    int index;
+    int start;
+    int end;
+    struct s_room *next;
+}               t_room;
+
+typedef struct s_item {
+	char           *key; //here the key will be the name
+	t_room *room; // struct s_art   *value;
+	struct s_item  *next;
+}               t_item;
+
+typedef struct s_dict {
+	t_item      **items;
+	int           capacity; //the capacity of the array 'items'
+}               t_dict;
+
+typedef struct  s_lemin
+{
+    t_graph *graph;
+    t_room  *start;
+    t_room  *end;
+    int     num_rooms;
+    int     num_of_ants;
+    t_room  *linked_rooms;
+    t_dict  *dict;
+}               t_lemin;
+
+
+
+/*
 ** Main functionallity
 */
 
@@ -91,12 +99,12 @@ void display(t_queue *q);
 int isEmpty(t_queue *q);
 void printQueue(t_queue *q);
 
-t_node *createNode(int);
+// t_node *createNode(int);
 
 t_graph *createGraph(int vertices);
-void addEdge(t_graph *graph, int src, int dest);
+void addEdge(t_lemin *lemin, char *room_from, char *room_to);
 void printGraph(t_graph *graph);
-void bfs(t_graph *graph, int startVertex, int endVertex, int size);
+void bfs(t_graph *graph, int startVertex, int endVertex, int size, t_lemin *lemin);
 
 
 // DICTIONNARY
